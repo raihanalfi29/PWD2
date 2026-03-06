@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Space Shooter</title>
+
+<style>
+
+body{
+margin:0;
+background:black;
+color:white;
+font-family:Arial;
+text-align:center;
+}
+
+canvas{
+background:#000;
+border:3px solid white;
+margin-top:20px;
+}
+
+button{
+padding:10px 20px;
+font-size:16px;
+margin-top:10px;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>🚀 Space Shooter</h2>
+
+<p>
+Tekan tombol di bawah untuk mulai bermain
+<br><br>
+Kontrol:
+<br>
+⬅️ Arrow Left = Gerak kiri
+<br>
+➡️ Arrow Right = Gerak kanan
+<br>
+SPACE = Menembak
+</p>
+
+<button onclick="startGame()">Start Game</button>
+
+<br>
+
+<canvas id="game" width="400" height="500"></canvas>
+
+<script>
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let player;
+let bullets;
+let enemies;
+let score;
+let gameLoop;
+
+function startGame(){
+
+player = {x:180,y:450,width:40,height:20};
+
+bullets = [];
+enemies = [];
+score = 0;
+
+clearInterval(gameLoop);
+gameLoop = setInterval(updateGame,30);
+
+}
+
+function updateGame(){
+
+ctx.clearRect(0,0,400,500);
+
+if(Math.random() < 0.03){
+enemies.push({x:Math.random()*370,y:0});
+}
+
+for(let i=0;i<bullets.length;i++){
+bullets[i].y -= 8;
+}
+
+for(let i=0;i<enemies.length;i++){
+enemies[i].y += 2;
+}
+
+for(let i=0;i<bullets.length;i++){
+for(let j=0;j<enemies.length;j++){
+
+let b = bullets[i];
+let e = enemies[j];
+
+if(
+b.x < e.x+30 &&
+b.x+5 > e.x &&
+b.y < e.y+30 &&
+b.y+10 > e.y
+){
+
+bullets.splice(i,1);
+enemies.splice(j,1);
+score++;
+break;
+
+}
+
+}
+}
+
+for(let i=0;i<enemies.length;i++){
+if(enemies[i].y > 480){
+
+clearInterval(gameLoop);
+alert("Game Over! Score: " + score);
+return;
+
+}
+}
+
+ctx.fillStyle="lime";
+ctx.fillRect(player.x,player.y,player.width,player.height);
+
+ctx.fillStyle="yellow";
+for(let b of bullets){
+ctx.fillRect(b.x,b.y,5,10);
+}
+
+ctx.fillStyle="red";
+for(let e of enemies){
+ctx.fillRect(e.x,e.y,30,30);
+}
+
+ctx.fillStyle="white";
+ctx.font="16px Arial";
+ctx.fillText("Score: " + score,10,20);
+
+}
+
+function shoot(){
+
+bullets.push({
+x:player.x+18,
+y:player.y
+});
+
+}
+
+document.addEventListener("keydown",function(e){
+
+if(!player) return;
+
+if(e.code === "ArrowLeft"){
+player.x -= 20;
+if(player.x < 0) player.x = 0;
+}
+
+if(e.code === "ArrowRight"){
+player.x += 20;
+if(player.x > 360) player.x = 360;
+}
+
+if(e.code === "Space"){
+e.preventDefault();
+shoot();
+}
+
+});
+
+</script>
+
+</body>
+</html>
